@@ -1,21 +1,27 @@
 <template>
   <div>
-    <div >
-      <Principal/>
-      <Invitation/>
+    <div>
+      <Principal />
+      <Invitation />
+      <Events />
+      <History />
     </div>
   </div>
 </template>
 
 <script>
-import Invitation from '../components/Invitation.vue';
+import Invitation from "../components/Invitation.vue";
 import Principal from "../components/Principal";
+import History from "../components/History";
+import Events from "../components/Events";
 export default {
   name: "Home",
   components: {
     Principal,
-    Invitation
-  }
+    Invitation,
+    History,
+    Events,
+  },
 };
 </script>
 <style >
