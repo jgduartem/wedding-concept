@@ -14,11 +14,11 @@
                   class="display-tc animate-box"
                   data-animate-effect="fadeIn"
                 >
-                  <h1 class="text-primary">John &amp; Jane</h1>
-                  <h2>We Are Getting Married</h2>
+                  <h1 class="text-primary">Lyna &amp; José</h1>
+                  <h2>Nos casaremos</h2>
                   <div class="simply-countdown simply-countdown-one"></div>
                   <p>
-                    <a href="#" class="btn btn-default btn-sm">Save the date</a>
+                    <a href="#" class="btn btn-default btn-sm">Guardar fecha</a>
                   </p>
                 </div>
               </div>
