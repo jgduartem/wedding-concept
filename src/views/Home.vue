@@ -42,6 +42,7 @@ import Principal from "../components/Principal";
 import History from "../components/History";
 import Events from "../components/Events";
 import Maps from "../components/Maps"
+import {getGuestByPhone} from "../firebase"
 export default {
   name: "Home",
   components: {
@@ -50,6 +51,23 @@ export default {
     History,
     Events,
     Maps
+  },
+  data() {
+    return {
+      phoneNumber: "",
+      guest: null
+    }
+  },
+  mounted() {
+    this.phoneNumber = this.$route.query.id
+    this.getGuest(this.$route.query.id)
+  },
+  methods: {
+    async getGuest(){
+      if (this.phoneNumber) {
+        this.guest = await getGuestByPhone(this.phoneNumber)
+      }
+    }
   },
   computed: {
     eventOneMessage() {
@@ -65,9 +83,9 @@ export default {
                     Su presencia será el mayor regalo. ¡Esperamos verles allí!`
     },
     isInvited() {
-      return this.$route.query.id ? true : false
+      return this.guest ? true : false
     }
-  }
+  },
 };
 </script>
 <style >
