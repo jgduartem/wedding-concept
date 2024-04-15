@@ -15,11 +15,8 @@
                   data-animate-effect="fadeIn"
                 >
                   <h1 class="text-primary">Lyna &amp; José</h1>
-                  <h2>Nos casaremos</h2>
+                  <!-- <h2>Nos casaremos</h2> -->
                   <div class="simply-countdown simply-countdown-one"></div>
-                  <p>
-                    <a href="#" class="btn btn-default btn-sm">Guardar fecha</a>
-                  </p>
                 </div>
               </div>
             </div>

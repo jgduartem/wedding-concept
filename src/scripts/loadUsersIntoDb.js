@@ -1,4 +1,8 @@
-export const guestsList = [
+const { initializeApp } = require("firebase/app");
+const { getFirestore, doc, setDoc } = require("firebase/firestore");
+//const { guestsList } = require("../utils/guests");
+
+const guestsList = [
     {
         full_name: "José Duarte",
         phone_number: "584120880770",
@@ -221,6 +225,17 @@ export const guestsList = [
         outside_country: false,
     },
     {
+        full_name: "Alexander Malave",
+        phone_number: "584148436177",
+        nick_name: "Alexander",
+        dependents: [
+            {name: "Doris Ruiz"},
+            {name: "Dorialis Malave"},
+            {name: "Alexandra Malave"}
+        ],
+        outside_country: false,
+    },
+    {
         full_name: "Williams Ruiz",
         phone_number: "584148789497",
         nick_name: "Tio Wiliams",
@@ -292,6 +307,16 @@ export const guestsList = [
         outside_country: false,
     },
     {
+        full_name: "Roxana Sanchez",
+        phone_number: "584248475015",
+        nick_name: "Roxana",
+        dependents: [
+            {name: "Gabriel Ruiz"},
+            {name: "Abraham Ruiz"}
+        ],
+        outside_country: false,
+    },
+    {
         full_name: "Liliana Lucchesse",
         phone_number: "584249150770",
         nick_name: "Tia Liliana",
@@ -342,6 +367,7 @@ export const guestsList = [
             {name: "Ibelice Mesa"},
             {name: "Chiquinquira Gonzalez"},
             {name: "Yvett Mesa"},
+            {name: "Airem Gonzalez"}
         ],
         outside_country: false,
     },
@@ -382,7 +408,7 @@ export const guestsList = [
         nick_name: "Chiqui",
         dependents: [
             {name: "Yvett Mesa"},
-            {name: "Airan Gonzalez"},
+            {name: "Airam Gonzalez"},
         ],
         outside_country: false,
     },
@@ -392,7 +418,7 @@ export const guestsList = [
         nick_name: "Yvett",
         dependents: [
             {name: "Chiquinquira Gonzalez"},
-            {name: "Airan Gonzalez"},
+            {name: "Airam Gonzalez"},
         ],
         outside_country: false,
     },
@@ -575,3 +601,24 @@ export const guestsList = [
         outside_country: false,
     }
 ]
+
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyDAzqybVhg6a-UyzlRdFRIyGuj2tL9L-RI",
+  authDomain: "boda-duarte-ruiz.firebaseapp.com",
+  projectId: "boda-duarte-ruiz",
+  storageBucket: "boda-duarte-ruiz.appspot.com",
+  messagingSenderId: "2555323531",
+  appId: "1:2555323531:web:52b1383f0434baeac6e08e",
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+(async () => {
+  guestsList.map(async (guest) => {
+    console.log("guardando: ", guest.full_name)
+    await setDoc(doc(db, "guests", guest.phone_number), guest);
+  });
+})();

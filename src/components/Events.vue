@@ -1,4 +1,5 @@
 <template>
+  <!-- https://ultimasnoticias.com.ve/wp-content/uploads/2019/04/Misa-Crismal.jpg -->
   <div
     id="fh5co-event"
     class="fh5co-bg bg-img"
@@ -19,19 +20,24 @@
             <div class="col-md-10 col-md-offset-1" style="display: flex; justify-content: center;">
               <div class="col-md-6 col-sm-6 text-center">
                 <div class="event-wrap animate-box">
-                  <h3>{{ this.$props.title }}</h3>
+                  <h3>{{ title }}</h3>
                   <div class="event-col">
                     <i class="icon-clock"></i>
-                    <span>{{ this.$props.startTime }}</span>
-                    <span>{{ this.$props.endTime }}</span>
+                    <span>{{ startTime }}</span>
+                    <span>{{ endTime }}</span>
                   </div>
                   <div class="event-col">
                     <i class="icon-calendar"></i>
-                    <span>{{this.$props.day}}</span>
-                    <span>{{ this.$props.month }}</span>
+                    <span>{{day}}</span>
+                    <span>{{ month }}</span>
                   </div>
                   <p>
-                    {{ this.$props.message }}
+                    {{ message }}
+                  </p>
+                  <p>
+                    <b>
+                      {{ postData }}
+                    </b>
                   </p>
                 </div>
               </div>
@@ -52,13 +58,15 @@ export default {
     endTime: String,
     day: String,
     month: String,
-    message: String
+    message: String,
+    postData: String
   }
 };
 </script>
 
 <style>
 .bg-img{
-  background-image: url("https://vivorest.com/wp-content/uploads/2023/01/foto-web-1.jpg")
+  background-image: url("https://vivorest.com/wp-content/uploads/2023/01/foto-web-1.jpg");
+  /* https://ultimasnoticias.com.ve/wp-content/uploads/2019/04/Misa-Crismal.jpg */
 }
 </style>

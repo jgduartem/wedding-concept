@@ -26,6 +26,8 @@ export const getGuests = async () => {
     return guestsSnapshot
 }
 
+
+// Get gest by phone
 export const getGuestByPhone = async (phone) => {
     let response = null
     const guestsRef = collection(db, "guests")
@@ -36,3 +38,5 @@ export const getGuestByPhone = async (phone) => {
     })
     return response
 }
+
+// Upload guests
