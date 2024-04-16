@@ -39,4 +39,20 @@ export const getGuestByPhone = async (phone) => {
     return response
 }
 
+export const getConfirmations = async (dependents) => {
+    dependents = dependents.map((name) => {
+        return name.name
+    })
+    let response = []
+    const confirmationsRef = collection(db, "confirmations")
+    const q = query(confirmationsRef, where("name", "in", dependents))
+    const confirmationSnapshot = await getDocs(q)
+    confirmationSnapshot.forEach((doc) => {
+        response.push(doc.data())
+    })
+    return response
+}
+
+
+
 // Upload guests

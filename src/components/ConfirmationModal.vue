@@ -17,10 +17,13 @@
             <div class="modal-body">
               <div>
                 <label style="margin-right: 1rem">{{ guest.full_name }} (Tú)</label>
-                <input type="checkbox" :id="guest.full_name" :value="guest.full_name" v-model="checkedNames">
-                <div class="menu-items" v-if="checkedNames.some(e => e == guest.full_name)">
+                <input type="checkbox" :id="guest.full_name"
+                  :value="{ name: guest.full_name }" v-model="checkedNames">
+                <div class="menu-items" v-if="checkedNames.some(e => e.name == guest.full_name)">
                   <div v-for="(item, idx) in menu" :key="idx">
-                    <div class="card" :style="`width: 18rem; border: 1px solid lightgrey; border-radius: 4px; cursor: pointer;`" @click="uppsertMenu({dish: item.name, selected_by: guest.full_name, index: 0})">
+                    <div class="card"
+                      :class="{ 'dishes': !isItemSelected(0, item.name, guest.full_name), 'selected-dish': isItemSelected(0, item.name, guest.full_name) }"
+                      @click="uppsertMenu({ dish: item.name, selected_by: guest.full_name, index: 0 })">
                       <img class="card-img-top" :src="item.photo_url" alt="Card image cap">
                       <div class="card-body">
                         <span class="card-title">{{ item.name }}</span>
@@ -31,15 +34,20 @@
                 </div>
               </div>
               <div v-for="(dependent, index) in guest.dependents" :key="index">
-                <label :for="dependent.name" style="margin-right: 1rem">{{ dependent.name }}</label>
-                <input type="checkbox" :id="index" :value="dependent.name" v-model="checkedNames">
-                <div class="menu-items" v-if="checkedNames.some(e => e == dependent.name)">
-                  <div v-for="(item, idx) in menu" :key="idx">
-                    <div class="card" style="width: 18rem; border: 1px solid lightgrey; border-radius: 4px; cursor: pointer;" @click="uppsertMenu({dish: item.name, selected_by: dependent.name, index: index + 1})">
-                      <img class="card-img-top" :src="item.photo_url" alt="Card image cap">
-                      <div class="card-body">
-                        <span class="card-title">{{ item.name }}</span>
-                        <p class="card-text">{{ item.description }}</p>
+                <div v-if="dependent.name !== guest.full_name">
+                  <label :for="dependent.name" style="margin-right: 1rem">{{ dependent.name }}</label>
+                  <input type="checkbox" :id="index" :value="{ name: dependent.name }"
+                    v-model="checkedNames">
+                  <div class="menu-items" v-if="checkedNames.some(e => e.name == dependent.name)">
+                    <div v-for="(item, idx) in menu" :key="idx">
+                      <div class="card"
+                        :class="{ 'dishes': !isItemSelected(index + 1, item.name, dependent.name), 'selected-dish': isItemSelected(index + 1, item.name, dependent.name) }"
+                        @click="uppsertMenu({ dish: item.name, selected_by: dependent.name, index: index + 1 })">
+                        <img class="card-img-top" :src="item.photo_url" alt="Card image cap">
+                        <div class="card-body">
+                          <span class="card-title">{{ item.name }}</span>
+                          <p class="card-text">{{ item.description }}</p>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -48,7 +56,7 @@
             </div>
             <div class="modal-footer">
               <button type="button" class="btn btn-secondary" @click="showModal = false">Cerrar</button>
-              <button type="button" class="btn btn-primary">Confirmar</button>
+              <button type="button" class="btn btn-primary" @click="confirmForm">Confirmar</button>
             </div>
           </div>
         </div>
@@ -57,10 +65,13 @@
   </div>
 </template>
 <script>
+import Vue from 'vue';
+import { setDoc, doc } from 'firebase/firestore';
+import { db, getConfirmations } from '../firebase/index'
 export default {
   name: "ConfirmationModal",
   props: {
-    guest: Object
+    guest: null
   },
   data() {
     return {
@@ -73,27 +84,85 @@ export default {
         { name: "Nuggets Con Papas Fritas (Menú Infantil)", description: "", photo_url: "vivo-nuggets.png" },
         { name: "Hamburguesa Con Queso (Menú Infantil)", description: "", photo_url: "vivo-burger.png" },
       ],
-      selectedMenu: []
+      selectedMenu: [],
+      isEditing: false,
+      confirmationList: []
     }
   },
-  computed: {
-    isItemSelected(index, dish, selected_by) {
-      return this.selectedMenu[index]?.dish == dish && this.selectedMenu[index]?.selected_by == selected_by
-    }
+  beforeMount() {
+    this.getUserConfirmations(this.guest.dependents)
   },
   methods: {
     uppsertMenu(value) {
-      const {index, ...otherProps} = value
-      this.selectedMenu[index] = {...otherProps}
-      console.log("this.selectedMenu", this.selectedMenu)
+      const { index, ...otherProps } = value
+      if (this.isItemSelected(index, otherProps.dish, otherProps.selected_by)) {
+        Vue.delete(this.selectedMenu, index)
+      } else {
+        Vue.set(this.selectedMenu, index, { ...otherProps });
+      }
+    },
+    isItemSelected(index, dish, selected_by) {
+      return (this.selectedMenu[index]?.dish == dish && this.selectedMenu[index]?.selected_by == selected_by) || this.selectedMenu.some(item => item.dish == dish && item.selected_by == selected_by)
+    },
+    confirmForm() {
+      let formattedData = []
+      try {
+        this.checkedNames.map((confirmation) => {
+          formattedData.push({
+            name: confirmation.name,
+            confirmed_by: this.guest.full_name,
+            dish: (this.selectedMenu.find((item) => item && item.selected_by == confirmation.name)).dish
+          })
+        })
+      } catch (error) {
+        console.log(error)
+        return
+      }
+      formattedData.map(async (confirmation) => {
+        await setDoc(doc(db, "confirmations", confirmation.name), confirmation);
+      })
+    },
+    async getUserConfirmations(dependents) {
+      dependents.push({ name: this.guest.full_name })
+      const response = await getConfirmations(dependents)
+      if (response.length > 0) {
+        this.isEditing = true
+      }
+      response.forEach((confirmation, index) => {
+        this.checkedNames.push({ name: confirmation.name })
+        this.confirmationList.push({[confirmation.name]: confirmation.confirmed_by})
+        this.selectedMenu.push({ index, dish: confirmation.dish, selected_by: confirmation.name })
+        // if (index == 0) {
+        //   this.uppsertMenu({index: 0, dish: confirmation.dish, selected_by: confirmation.name})
+        // } else {
+        //   this.uppsertMenu({index: this.guest.dependents.findIndex(dependent => dependent.name == confirmation.name), dish: confirmation.dish, selected_by: confirmation.name})
+        // }
+      })
+      console.log("confirmationList: ", this.confirmationList)
+
     }
   },
 }
 </script>
 <style>
+.dishes {
+  width: 18rem;
+  border-radius: 4px;
+  cursor: pointer;
+  border: 1px solid lightgray;
+}
+
+.selected-dish {
+  width: 18rem;
+  border-radius: 4px;
+  cursor: pointer;
+  border: 2px solid #D68910;
+}
+
 .modal-mask {
   display: flex !important;
-  justify-content: center;;
+  justify-content: center;
+  ;
   position: fixed;
   z-index: 9998;
   top: 0;

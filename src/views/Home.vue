@@ -16,7 +16,9 @@
           url="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d15707.439272633927!2d-64.6892969!3d10.1920375!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8c2d7382b3f91c17%3A0xc706d7fc41f07f56!2sVIVO%20Rest!5e0!3m2!1ses!2sve!4v1712281745440!5m2!1ses!2sve"
           width="400" height="300" style="border:0;" allowfullscreen="" loading="lazy"
           referrerpolicy="no-referrer-when-downgrade" />
-        <ConfirmationModal :guest="guest"/>
+        <div v-if="guest">
+          <ConfirmationModal :guest="guest"/>
+        </div>
       </div>
       <!-- <History /> -->
     </div>
