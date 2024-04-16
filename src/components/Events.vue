@@ -2,7 +2,8 @@
   <!-- https://ultimasnoticias.com.ve/wp-content/uploads/2019/04/Misa-Crismal.jpg -->
   <div
     id="fh5co-event"
-    class="fh5co-bg bg-img"
+    class="fh5co-bg"
+    :class="{'bg-img-church': title === 'Ceremonia eclesiástica', 'bg-img-vivo': title === 'Recepción y fiesta' }"
   >
     <div class="overlay"></div>
     <div class="container">
@@ -65,8 +66,13 @@ export default {
 </script>
 
 <style>
-.bg-img{
-  background-image: url("https://vivorest.com/wp-content/uploads/2023/01/foto-web-1.jpg");
-  /* https://ultimasnoticias.com.ve/wp-content/uploads/2019/04/Misa-Crismal.jpg */
+.bg-img-vivo{
+  background-image: url("/bg-vivo.jpeg");
 }
+
+.bg-img-church {
+   background-image: url("/bg-church.jpeg");
+}
+
+
 </style>

@@ -17,7 +17,7 @@
           width="400" height="300" style="border:0;" allowfullscreen="" loading="lazy"
           referrerpolicy="no-referrer-when-downgrade" />
         <div v-if="guest">
-          <ConfirmationModal :guest="guest"/>
+          <ConfirmationModal :guest="guest" />
         </div>
       </div>
       <!-- <History /> -->
@@ -48,6 +48,10 @@ export default {
       phoneNumber: "",
       guest: null
     }
+  },
+  created() {
+    this.$route.meta.title = `Boda Duarte Ruiz`
+    document.title = this.$route.meta.title;
   },
   mounted() {
     this.phoneNumber = this.$route.query.id

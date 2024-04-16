@@ -17,8 +17,7 @@
             <div class="modal-body">
               <div>
                 <label style="margin-right: 1rem">{{ guest.full_name }} (Tú)</label>
-                <input type="checkbox" :id="guest.full_name"
-                  :value="{ name: guest.full_name }" v-model="checkedNames">
+                <input type="checkbox" :id="guest.full_name" :value="{ name: guest.full_name }" v-model="checkedNames">
                 <div class="menu-items" v-if="checkedNames.some(e => e.name == guest.full_name)">
                   <div v-for="(item, idx) in menu" :key="idx">
                     <div class="card"
@@ -36,8 +35,7 @@
               <div v-for="(dependent, index) in guest.dependents" :key="index">
                 <div v-if="dependent.name !== guest.full_name">
                   <label :for="dependent.name" style="margin-right: 1rem">{{ dependent.name }}</label>
-                  <input type="checkbox" :id="index" :value="{ name: dependent.name }"
-                    v-model="checkedNames">
+                  <input type="checkbox" :id="index" :value="{ name: dependent.name }" v-model="checkedNames">
                   <div class="menu-items" v-if="checkedNames.some(e => e.name == dependent.name)">
                     <div v-for="(item, idx) in menu" :key="idx">
                       <div class="card"
@@ -55,7 +53,11 @@
               </div>
             </div>
             <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" @click="showModal = false">Cerrar</button>
+              <button type="button" class="btn btn-secondary" @click="() => {
+                this.getUserConfirmations(guest.dependents)
+                showModal = false
+
+              }">Cerrar</button>
               <button type="button" class="btn btn-primary" @click="confirmForm">Confirmar</button>
             </div>
           </div>
@@ -66,8 +68,9 @@
 </template>
 <script>
 import Vue from 'vue';
-import { setDoc, doc } from 'firebase/firestore';
+import { setDoc, doc, deleteDoc } from 'firebase/firestore';
 import { db, getConfirmations } from '../firebase/index'
+import swal from 'sweetalert';
 export default {
   name: "ConfirmationModal",
   props: {
@@ -86,7 +89,8 @@ export default {
       ],
       selectedMenu: [],
       isEditing: false,
-      confirmationList: []
+      confirmationList: [],
+      initialList: []
     }
   },
   beforeMount() {
@@ -115,12 +119,23 @@ export default {
           })
         })
       } catch (error) {
+        swal({title: `${this.guest.nick_name}!`, text: "Debes seleccionar un plato por cada persona confirmada!", buttons: {confirm: {text: "Ok", className: "ok-button"}}, icon: "error"});
         console.log(error)
         return
+      }
+      const toDelete = this.initialList.filter((e) => !formattedData.some(i => i.name == e.name))
+      if (toDelete.length > 0) {
+        toDelete.map(async (item) => {
+        await deleteDoc(doc(db, "confirmations", item.name))
+      })
       }
       formattedData.map(async (confirmation) => {
         await setDoc(doc(db, "confirmations", confirmation.name), confirmation);
       })
+      this.getUserConfirmations(this.guest.dependents)
+      swal({title: `Gracias ${this.guest.nick_name}!`, text: "Hemos registrado tu confirmación!", buttons: {confirm: {text: "Ok", className: "ok-button"}}, icon: "success"});
+      this.showModal = false
+      
     },
     async getUserConfirmations(dependents) {
       dependents.push({ name: this.guest.full_name })
@@ -130,7 +145,8 @@ export default {
       }
       response.forEach((confirmation, index) => {
         this.checkedNames.push({ name: confirmation.name })
-        this.confirmationList.push({[confirmation.name]: confirmation.confirmed_by})
+        this.initialList.push({ name: confirmation.name })
+        this.confirmationList.push({ [confirmation.name]: confirmation.confirmed_by })
         this.selectedMenu.push({ index, dish: confirmation.dish, selected_by: confirmation.name })
         // if (index == 0) {
         //   this.uppsertMenu({index: 0, dish: confirmation.dish, selected_by: confirmation.name})
@@ -138,7 +154,6 @@ export default {
         //   this.uppsertMenu({index: this.guest.dependents.findIndex(dependent => dependent.name == confirmation.name), dish: confirmation.dish, selected_by: confirmation.name})
         // }
       })
-      console.log("confirmationList: ", this.confirmationList)
 
     }
   },
@@ -249,5 +264,13 @@ export default {
 
 .card-text {
   font-size: 14px;
+}
+
+.ok-button {
+  background-color:#D68910;
+}
+
+.ok-button:not([disabled]):hover {
+  background-color: #D68910;
 }
 </style>
