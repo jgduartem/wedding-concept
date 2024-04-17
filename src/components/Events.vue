@@ -36,6 +36,7 @@
                     {{ message }}
                   </p>
                   <p>
+                    {{ dressCode }}
                     <b>
                       {{ postData }}
                     </b>
@@ -60,7 +61,8 @@ export default {
     day: String,
     month: String,
     message: String,
-    postData: String
+    postData: String,
+    dressCode: String
   }
 };
 </script>
