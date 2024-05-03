@@ -1,7 +1,7 @@
 <template>
   <div>
     <!-- Button trigger modal -->
-    <button type="button" class="btn btn-primary launch-btn" @click="showModal = true">
+    <button type="button" class="btn btn-primary launch-btn" disabled @click="showModal = true">
       Confirmar
     </button>
 
