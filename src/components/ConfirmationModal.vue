@@ -58,7 +58,7 @@
                 showModal = false
 
               }">Cerrar</button>
-              <button type="button" class="btn btn-primary" @click="confirmForm">Confirmar</button>
+              <button type="button" class="btn btn-primary" @click="confirmForm" disabled>Confirmar</button>
             </div>
           </div>
         </div>
